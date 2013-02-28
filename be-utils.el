@@ -23,7 +23,24 @@
       (-be/util-eval-on-load file-paths body)
     (-be/util-eval-on-load (list file-paths) body)))
 
+(defmacro be/util-eval-on-mode (mode-name &rest body)
+  (let ((callback-name (intern (format "be/%s-%s-hook"
+                                       mode-name
+                                       (or (and
+                                            load-file-name
+                                            (file-name-nondirectory load-file-name))
+                                           ""))))
+        (mode-hook (intern (format "%s-hook" mode-name))))
+    `(progn
+       (when (boundp ',mode-hook)
+         (defun ,callback-name ()
+           ,@body)
+         (add-hook ',mode-hook
+                   ',callback-name
+                   t)))))
+
 (put 'be/util-eval-on-load 'lisp-indent-function 'defun)
+(put 'be/util-eval-on-mode 'lisp-indent-function 'defun)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; File Navigation

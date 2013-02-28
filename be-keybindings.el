@@ -32,4 +32,9 @@
   (evil-define-key 'normal global-map
     (kbd ",ma") 'be/iedit-toggle))
 
+(be/util-eval-on-load "evil"
+  (be/util-eval-on-mode emacs-lisp-mode
+    (evil-define-key 'normal emacs-lisp-mode-map
+      (kbd ",ep") 'be/elisp-eval-para)))
+
 (provide 'be-keybindings)
