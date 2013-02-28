@@ -47,6 +47,11 @@
   (define-key global-map
     (kbd "<f7>n") 'be/evil-normal-state)
 
+  ;; aliases for Roman & Tavis
+  (define-key global-map
+    (kbd "<f7>r") 'be/evil-normal-state)
+  (define-key global-map
+    (kbd "<f7>t") 'be/evil-emacs-state)
   )
 
 (provide 'be-evil)
