@@ -14,11 +14,11 @@
 
   (defun be/haskell-cabal-dir ()
     "Returns the directory path where the *.cabal file is."
-    (be.utils/locate-dominating-file "*.cabal"))
+    (be/util-locate-dominating-file "*.cabal"))
 
   (defun be/haskell-cabal-dev-dir ()
     "Returns the directory path where the cabal-dev folder is."
-    (be.utils/locate-dominating-file "cabal-dev"))
+    (be/util-locate-dominating-file "cabal-dev"))
 
   (defun be/haskell-cabal-dev-configure ()
     (interactive)
