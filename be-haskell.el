@@ -58,3 +58,5 @@
     (kbd ",ii") 'inferior-haskell-info
     (kbd ",it") 'inferior-haskell-type)
   )
+
+(provide 'be-haskell)
