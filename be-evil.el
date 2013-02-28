@@ -48,3 +48,5 @@
     (kbd "<f7>n") 'be/evil-normal-state)
 
   )
+
+(provide 'be-evil)
