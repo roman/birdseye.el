@@ -1,6 +1,6 @@
-(progn ;; ignore-errors
-  (require 'be-utils)
-  (require 'haskell-mode)
+(require 'be-utils)
+
+(be/util-eval-on-load "haskell-mode"
 
   (defun be/haskell-switch-to-ghci ()
     "Pops the ghci buffer, in case it is already there asks to reload it."
@@ -43,20 +43,5 @@
   )
 
 ;; Evil keybindings ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(ignore-errors
-  (require 'evil)
-  (require 'haskell-mode)
-  (evil-define-key 'normal haskell-mode-map
-    (kbd ",gi") 'be/haskell-switch-to-ghci
-    (kbd ",rc") 'be/haskell-cabal-dev-configure
-    (kbd ",at") 'be/haskell-add-type-signature
-    (kbd ",fl") 'inferior-haskell-load-file
-    (kbd ",fr") 'inferior-haskell-reload-file
-    (kbd ",ef") 'inferior-haskell-send-decl
-    (kbd ",.")  'inferior-haskell-find-definition
-    (kbd ",ii") 'inferior-haskell-info
-    (kbd ",it") 'inferior-haskell-type)
-  )
 
 (provide 'be-haskell)

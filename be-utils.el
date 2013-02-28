@@ -1,4 +1,15 @@
+(require 'dash)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defmacro be/define-key (keymap &rest keybindings)
+  `(progn
+     ,@(-map (lambda (it)
+               `(define-key ,keymap ,@it))
+             (-partition 2 keybindings))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Dependency Management
 
 (defun -be/util-eval-on-load (file-paths body)
   (if (car file-paths)
@@ -15,6 +26,7 @@
 (put 'be/util-eval-on-load 'lisp-indent-function 'defun)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; File Navigation
 
 (defun be/util-parent-dir (dir)
   "Returns the parent directory path of given directory path."

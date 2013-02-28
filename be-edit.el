@@ -1,18 +1,18 @@
 (require 'be-utils)
 
-(be/util-eval-on-load "iedit"
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; iedit
 
-  (defvar *be-iedit-auto-complete-was-on* nil)
-  (make-variable-buffer-local '*be-iedit-auto-complete-was-on*)
+(be/util-eval-on-load "iedit"
 
   (defun be/iedit-toggle ()
     (interactive)
-    (iedit-mode))
-
-  (define-key global-map
-    (kbd "<f4>e") 'be/iedit-toggle))
+    (iedit-mode)))
 
 (be/util-eval-on-load ("iedit" "auto-complete")
+
+  (defvar *be-iedit-auto-complete-was-on* nil)
+  (make-variable-buffer-local '*be-iedit-auto-complete-was-on*)
 
   (defadvice be/iedit-toggle (around iedit-autocomplete activate)
     "Handles auto-complete-mode when going to iedit-mode"
@@ -28,19 +28,13 @@
             (auto-complete-mode nil))))
       ad-do-it)))
 
-;; occur-mode is always there on emacs > 24
-(when (fboundp 'occur)
-  (defun be/occur-at-point ()
-    (interactive)
-    (occur (thing-at-point 'symbol))))
 
-(be/util-eval-on-load ("evil")
-  (evil-define-key 'normal global-map
-    (kbd "<f4>o") 'be/occur-at-point))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; occur
 
-(be/util-eval-on-load ("evil" "iedit")
-  (evil-define-key 'normal global-map
-    (kbd ",ma") 'be/iedit-toggle))
+(defun be/occur-at-point ()
+  (interactive)
+  (occur (thing-at-point 'symbol)))
 
 
 (provide 'be-edit)
