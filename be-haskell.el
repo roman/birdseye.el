@@ -1,6 +1,6 @@
 (require 'be-utils)
 
-(be/util-eval-on-load "haskell-mode"
+(be/util-eval-on-mode haskell-mode
 
   (defun be/haskell-switch-to-ghci ()
     "Pops the ghci buffer, in case it is already there asks to reload it."
@@ -41,7 +41,5 @@
         (error (message "couldn't insert type from ghci")))))
 
   )
-
-;; Evil keybindings ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (provide 'be-haskell)

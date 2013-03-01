@@ -1,17 +1,23 @@
 (require 'be-utils)
 
-(be/util-eval-on-load "navorski"
-  (define-key global-map
-    (kbd "M-]") 'nav/term))
+(be/util-eval-on-load ("navorski" "be-terminal")
+  (be/define-key global-map
+    (kbd "M-]") 'nav/term
+    (kbd "M-g") 'be/terminal-toggle-mode))
 
-;; TODO: Tavis, how to do this?
+;; Not working T_T
 (be/util-eval-on-load ("evil" "navorski" "be-terminal")
-  (evil-define-key 'normal term-mode-map
-    (kbd "<f7>e") 'be/term-evil-char-mode)
-  (evil-define-key 'emacs term-mode-map
-    (kbd "<f7>n") 'be/term-evil-line-mode))
+  (evil-define-key term-mode-map
+    (kbd "<f7>e") be/terminal-evil-char-mode
+    (kbd "<f7>n") be/terminal-evil-line-mode)
 
-(be/util-eval-on-load ("evil" "haskell-mode" "be-haskell")
+  (setq term-bind-key-alist
+        (append term-bind-key-alist
+                '(("<f7>e" . be/terminal-evil-char-mode)
+                  ("<f7>n" . be/terminal-evil-line-mode)
+                  ("M-g" . be/terminal-toggle-mode)))))
+
+(be/util-eval-on-load ("evil" "be-haskell")
  (evil-define-key 'normal haskell-mode-map
     (kbd ",gi") 'be/haskell-switch-to-ghci
     (kbd ",rc") 'be/haskell-cabal-dev-configure
@@ -36,5 +42,16 @@
   (be/util-eval-on-mode emacs-lisp-mode
     (evil-define-key 'normal emacs-lisp-mode-map
       (kbd ",ep") 'be/elisp-eval-para)))
+
+(be/util-eval-on-load ("evil")
+  (be/define-key global-map
+    (kbd "<f7>e") 'be/evil-emacs-state
+    (kbd "<f7>n") 'be/evil-normal-state
+
+    ;; aliases for Roman & Tavis
+    (kbd "<f7>r") 'be/evil-normal-state
+    (kbd "<f7>t") 'be/evil-emacs-state))
+
+
 
 (provide 'be-keybindings)

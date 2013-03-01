@@ -8,6 +8,8 @@
                `(define-key ,keymap ,@it))
              (-partition 2 keybindings))))
 
+(put 'be/define-key 'lisp-indent-function 'defun)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dependency Management
 

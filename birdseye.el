@@ -7,5 +7,6 @@
 
 (require 'iedit)
 (require 'auto-complete)
+(require 'navorski)
 
 (provide 'birdseye)
