@@ -5,11 +5,10 @@
     (kbd "M-]") 'nav/term
     (kbd "M-g") 'be/terminal-toggle-mode))
 
-;; Not working T_T
 (be/util-eval-on-load ("evil" "navorski" "be-terminal")
-  (evil-define-key term-mode-map
-    (kbd "<f7>e") be/terminal-evil-char-mode
-    (kbd "<f7>n") be/terminal-evil-line-mode)
+  (be/define-key term-mode-map
+    (kbd "<f7>e") 'be/terminal-evil-char-mode
+    (kbd "<f7>n") 'be/terminal-evil-line-mode)
 
   (setq term-bind-key-alist
         (append term-bind-key-alist
@@ -52,6 +51,10 @@
     (kbd "<f7>r") 'be/evil-normal-state
     (kbd "<f7>t") 'be/evil-emacs-state))
 
+(be/util-eval-on-load ("org")
+  (be/define-key global-map
+    (kbd "<f8>-") 'org-clock-goto
+    (kbd "<f8>l") 'org-clock-in-last))
 
 
 (provide 'be-keybindings)
