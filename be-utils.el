@@ -1,5 +1,30 @@
 (require 'dash)
 
+(defun be/flash-region (beg end)
+  (interactive "r")
+  (let ((ovl (make-overlay beg end))
+        (was-mark-active mark-active)
+        (hl-line-mode-on hl-line-mode))
+    (setq mark-active nil)
+    (overlay-put ovl 'face 'highlight)
+    (run-with-timer 0.5 nil
+                    (lambda (ovl was-mark-active)
+                      (delete-overlay ovl)
+                      (setq mark-active was-mark-active))
+                    ovl was-mark-active)))
+
+(defun be/indent-region (beg end)
+  "Shamelessly stolen from evil-mode, Indent text."
+  (interactive "r")
+  (if (and (= beg (line-beginning-position))
+           (= end (line-beginning-position 2)))
+      ;; since some Emacs modes can only indent one line at a time,
+      ;; implement "==" as a call to `indent-according-to-mode'
+      (indent-according-to-mode)
+    (goto-char beg)
+    (indent-region beg end))
+  (back-to-indentation))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defmacro be/define-key (keymap &rest keybindings)
