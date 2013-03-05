@@ -1,5 +1,8 @@
 (require 'be-utils)
 
+(be/define-key global-map
+  (kbd "<f5>") 'undo)
+
 (be/util-eval-on-load ("navorski" "be-terminal")
   (be/define-key global-map
     (kbd "M-]") 'nav/term
