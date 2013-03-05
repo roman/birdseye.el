@@ -74,8 +74,11 @@
 
 (defun be/util-parent-dir (dir)
   "Returns the parent directory path of given directory path."
-  (file-name-directory
-   (directory-file-name dir)))
+  (if (or (not dir)
+          (string-equal dir "/"))
+      nil
+    (file-name-directory
+     (directory-file-name dir))))
 
 (be/util-eval-on-load "em-glob"
   (defun be/util-locate-dominating-file (glob &optional start-dir)
