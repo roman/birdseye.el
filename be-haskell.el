@@ -132,11 +132,6 @@
 
 (be/util-eval-on-mode haskell-mode
 
-  (ghc-init)
-  (linum-mode 1)
-  (flymake-mode 1)
-  (haskell-indent-mode)
-
   (defun be/haskell-cabal-dir ()
     "Returns the directory path where the *.cabal file is."
     (be/util-parent-dir (be/util-locate-dominating-file "*.cabal")))
@@ -177,7 +172,7 @@
       (if (and cabal-dev-path
                (executable-find "cabal-dev"))
           (let ((default-directory cabal-dev-path))
-            (call-process-shell-command "cabal-dev configure" nil 0)
+            (call-process-shell-command "cabal-dev configure --enable-tests" nil 0)
             (message "cabal-dev configure done"))
         (message "cabal-dev bin or directory wasn't found"))))
 
@@ -202,6 +197,8 @@
       (when (and cabal-dev-path
                  (executable-find "cabal-dev"))
         (compile "cabal-dev build"))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   (defun be/haskell-add-type-signature ()
     (interactive)
@@ -229,6 +226,15 @@
     (interactive)
     (align-regexp
      (region-beginning) (region-end)
-     "\\(\\s-*\\) = " 1 0 nil)))
+     "\\(\\s-*\\) = " 1 0 nil))
+
+  (setq inferior-haskell-find-project-root nil)
+  (ghc-init)
+  (linum-mode 1)
+  (flymake-mode 1)
+  (haskell-indent-mode)
+  (require 'auto-complete)
+
+  )
 
 (provide 'be-haskell)
