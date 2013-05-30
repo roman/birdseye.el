@@ -4,10 +4,13 @@
 
 (be/util-eval-on-mode emacs-lisp-mode
 
-  (be/create-eval-functions elisp 'eval-region)
+  (defun be/elisp-find-function-at-point ()
+    "Find directly the function at point in the current window."
+    (interactive)
+    (let ((symb (function-called-at-point)))
+      (when symb
+        (find-function symb))))
 
   )
-
-(fmakunbound 'be/elisp-eval-para)
 
 (provide 'be-elisp)

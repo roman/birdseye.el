@@ -1,7 +1,17 @@
 (require 'be-utils)
 
 (be/define-key global-map
-  (kbd "<f5>") 'undo)
+  (kbd "<f5>") 'undo
+  (kbd "<f4>m") 'mark-sexp
+  (kbd "<f4>e") 'iedit-mode
+  (kbd "<f4>d") 'eval-defun)
+
+(be/util-eval-on-load "be-elisp"
+  (be/define-key emacs-lisp-mode-map
+    (kbd "M-.") 'be/elisp-find-function-at-point)
+  (be/util-eval-on-load ("evil")
+    (evil-define-key 'normal emacs-lisp-mode-map
+      (kbd "M-.") 'be/elisp-find-function-at-point)))
 
 (be/util-eval-on-load ("navorski" "be-terminal")
   (be/define-key global-map
@@ -48,11 +58,6 @@
   (evil-define-key 'normal global-map
     (kbd ",ma") 'be/iedit-toggle))
 
-(be/util-eval-on-load "evil"
-  (be/util-eval-on-mode emacs-lisp-mode
-    (evil-define-key 'normal emacs-lisp-mode-map
-      (kbd ",ep") 'be/elisp-eval-para)))
-
 (be/util-eval-on-load ("evil")
   (be/define-key global-map
     (kbd "<f7>e") 'be/evil-emacs-state
@@ -66,7 +71,5 @@
   (be/define-key global-map
     (kbd "<f8>-") 'org-clock-goto
     (kbd "<f8>l") 'org-clock-in-last))
-
-
 
 (provide 'be-keybindings)

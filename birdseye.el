@@ -1,5 +1,6 @@
 (require 'be-utils)
 (require 'be-terminal)
+(require 'be-clojure)
 (require 'be-haskell)
 (require 'be-evil)
 (require 'be-elisp)
