@@ -1,5 +1,7 @@
 (require 'be-utils)
 
+(add-to-list 'load-path (expand-file-name "~/.cabal/share/ghc-mod-latest/"))
+
 (be/util-eval-on-load ("auto-complete" "haskell-mode")
 
   (defconst be/haskell-reserved-keywords
@@ -130,45 +132,81 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(be/util-eval-on-mode haskell-mode
+(be/util-eval-on-mode "haskell-mode"
+  (be/util-eval-on-load "em-glob"
 
-  (defun be/haskell-cabal-dir ()
-    "Returns the directory path where the *.cabal file is."
-    (be/util-parent-dir (be/util-locate-dominating-file "*.cabal")))
+    (defun be/haskell-find-cabal-dir ()
+      "Returns the directory path where the *.cabal file is."
+      (be/util-parent-dir (be/util-locate-dominating-file "*.cabal")))
 
-  (defun be/haskell-cabal-dev-dir ()
-    "Returns the directory path where the cabal-dev folder is."
-    (let ((cabal-dir (be/haskell-cabal-dir))
-          (cabal-dev-dir (be/util-locate-dominating-file "cabal-dev")))
-      (while (or (not (string-equal cabal-dir cabal-dev-dir))
-                 (not cabal-dev-dir))
-        (setq cabal-dev-dir (be/util-parent-dir cabal-dev-dir)))
-      cabal-dev-dir))
+    (defun be/haskell-find-cabal-sandbox-dir ()
+      "Returns the directory path where the .cabal-sandbox folder is."
+      (let ((cabal-dir (be/haskell-find-cabal-dir))
+            (cabal-sandbox-dir (be/util-locate-dominating-file ".cabal-sandbox")))
+        (while (and cabal-dir cabal-sandbox-dir
+                    (or (not (string-equal cabal-dir cabal-sandbox-dir))
+                        (not cabal-sandbox-dir)))
+          (setq cabal-sandbox-dir (be/util-parent-dir cabal-sandbox-dir)))
+        cabal-sandbox-dir))
 
+    (defun be/haskell-find-cabal-dev-dir ()
+      "Returns the directory path where the cabal-dev folder is."
+      (let ((cabal-dir (be/haskell-find-cabal-dir))
+            (cabal-dev-dir (be/util-locate-dominating-file "cabal-dev")))
+        (while (and cabal-dir cabal-dev-dir
+                    (or (not (string-equal cabal-dir cabal-dev-dir))
+                        (not cabal-dev-dir)))
+          (setq cabal-dev-dir (be/util-parent-dir cabal-dev-dir)))
+        cabal-dev-dir))
 
-  (defun be/haskell-switch-to-ghci (&optional no-reload)
-    "Pops the ghci buffer, in case it is already there asks to reload it."
-    (interactive)
+    (defun be/haskell-find-cabal-sandbox-package-db ()
+      (interactive)
+      (let* ((project-root (be/haskell-find-cabal-dir))
+             (cabal-sandbox-dirname
+              (file-name-as-directory (concat project-root ".cabal-sandbox"))))
+        (car (directory-files cabal-sandbox-dirname
+                              t
+                              (eshell-glob-regexp "*-packages.conf.d")))))
 
-    ;; restart ghci?
-    (when (not no-reload)
-      (let ((buffer (get-buffer "*haskell*")))
-        (when (and buffer
-                   (y-or-n-p "Do you want to reload ghci? "))
-          (set-process-query-on-exit-flag (get-buffer-process buffer) nil)
-          (kill-buffer buffer))))
+    (defun be/haskell-switch-to-ghci (&optional no-reload)
+      "Pops the ghci buffer, in case it is already there asks to reload it."
+      (interactive)
 
-    ;; setup "cabal-dev ghci" in case we are using cabal-dev
-    (let* ((cabal-dev-dir (be/haskell-cabal-dev-dir))
-           (default-directory (or cabal-dev-dir default-directory))
-           (haskell-program-name (or (and cabal-dev-dir
-                                          "cabal-dev ghci")
-                                     haskell-program-name)))
-      (switch-to-haskell)))
+      ;; restart ghci?
+      (when (not no-reload)
+        (let ((buffer (get-buffer "*haskell*")))
+          (when (and buffer
+                     (y-or-n-p "Do you want to reload ghci? "))
+            (set-process-query-on-exit-flag (get-buffer-process buffer) nil)
+            (kill-buffer buffer))))
+
+      ;; setup "cabal-dev ghci" in case we are using cabal-dev
+      ;; setup special ghci in case we are using cabal sandbox
+      (let* ((cabal-dev-dir (be/haskell-find-cabal-dev-dir))
+             (cabal-sandbox-dir (be/haskell-find-cabal-sandbox-dir))
+             (default-directory (or cabal-sandbox-dir
+                                    cabal-dev-dir
+                                    default-directory))
+             (haskell-program-name (or (and cabal-sandbox-dir
+                                            (format "ghci \"-package-db\" \"%s\" \"-isrc\""
+                                                    (be/haskell-find-cabal-sandbox-package-db)))
+                                       (and cabal-dev-dir
+                                            "cabal-dev \"ghci\"")
+                                       haskell-program-name)))
+        (switch-to-haskell)))
+
+    (defun be/haskell-jump-to-cabal-file ()
+      (interactive)
+      (let* ((cabal-dir (be/haskell-find-cabal-dir))
+             (cabal-file (car
+                          (directory-files
+                           cabal-dir nil
+                           (eshell-glob-regexp "*.cabal")))))
+        (find-file (concat cabal-dir cabal-file)))))
 
   (defun be/haskell-cabal-dev-configure ()
     (interactive)
-    (let ((cabal-dev-path (be/haskell-cabal-dev-dir)))
+    (let ((cabal-dev-path (be/haskell-find-cabal-dev-dir)))
       (if (and cabal-dev-path
                (executable-find "cabal-dev"))
           (let ((default-directory cabal-dev-path))
@@ -178,7 +216,7 @@
 
   (defun be/haskell-cabal-dev-reload-dependencies ()
     (interactive)
-    (let ((cabal-dev-path (be/haskell-cabal-dev-dir)))
+    (let ((cabal-dev-path (be/haskell-find-cabal-dev-dir)))
       (if (and cabal-dev-path
                (executable-find "cabal-dev"))
           (let ((default-directory cabal-dev-path))
@@ -192,13 +230,128 @@
 
   (defun be/haskell-cabal-dev-build ()
     (interactive)
-    (let* ((cabal-dev-path (be/haskell-cabal-dev-dir))
+    (let* ((cabal-dev-path (be/haskell-find-cabal-dev-dir))
            (default-directory (or cabal-dev-path default-directory)))
       (when (and cabal-dev-path
                  (executable-find "cabal-dev"))
         (compile "cabal-dev build"))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; Add Lang Pragmas/Options ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (defun be/haskell-add-lang-option (option)
+    (interactive (list
+                  (ido-completing-read
+                   "Which? "
+                   be/haskell-ghc-language-options)))
+    (save-excursion
+      (beginning-of-buffer)
+      (when (not (search-forward option nil t))
+        (insert (format "{-# LANGUAGE %s #-}\n" option)))))
+
+
+  ;; Add Import Statements ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (defun be/haskell-ghc-insert-module ()
+    (interactive)
+    (if (not (executable-find ghc-hoogle-command))
+        (message "\"%s\" not found" ghc-hoogle-command)
+      (let* ((expr0 (ghc-things-at-point))
+             (expr (ghc-read-expression expr0)))
+        (let ((mods (ghc-function-to-modules expr)))
+          (if (null mods)
+              (message "No module guessed")
+            (let* ((first (car mods))
+                   (mod (if (= (length mods) 1)
+                            first
+                          (completing-read "Module name: " mods nil t first))))
+              (be/haskell-add-import mod expr)))))))
+
+  (defun be/haskell-find-module-import (mod)
+    (interactive "sModule: ")
+    (goto-char (point-min))
+    (re-search-forward (format "^import +\\(qualified\\)? +%s +" mod) nil t))
+
+  (defun be/haskell-add-import (mod expr)
+    (interactive)
+    (when (not (and (ignore-errors (inferior-haskell-get-module expr))
+                    (progn
+                      (beginning-of-buffer)
+                      ;;TODO: fix this for multi-line imports
+                      (re-search-forward (format "^import .*%s +*%s" mod expr) nil t))))
+      (let ((existing-import (save-excursion
+                               (be/haskell-find-module-import mod))))
+        (if existing-import
+            (progn
+              (goto-char (match-beginning 0))
+              (end-of-line)
+              (backward-char 1)
+              (up-list)
+              (backward-char 1)
+              (insert ", " expr))
+          (progn
+            (ghc-goto-module-position)
+            (insert (format "import %s (%s)\n" mod expr)))))))
+
+  ;; HELM support for hoogle ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (be/util-eval-on-load "helm"
+
+    (defun be/helm-c-hoogle-set-candidates (&optional request-prefix)
+      (let* ((pattern (or (and request-prefix
+                               (concat request-prefix
+                                       " " helm-pattern))
+                          helm-pattern))
+             (short-pattern
+              (if (string-match "\\`\\([a-zA-Z_][a-zA-Z0-9_]*\\) " pattern)
+                  (match-string 1 pattern)
+                pattern))
+             (lim helm-candidate-number-limit)
+             (args (append (list "search" "-l")
+                           (and nil lim (list "-n" (int-to-string lim)))
+                           (list short-pattern))))
+        (let (candidates)
+          (with-temp-buffer
+            (apply #'call-process "hoogle" nil t nil args)
+            (goto-char (point-min))
+            (while (not (eobp))
+              (if (looking-at "\\([^ ]+\\) *\\([^ ]+\\) :: \\(.+?\\) * -- \\(.+\\)")
+                  (push (cons (format
+                               "%s %s :: %s"
+                               (match-string 1)
+                               (match-string 2)
+                               (match-string 3))
+                              (cons
+                               (match-string-no-properties 1)
+                               (match-string-no-properties 2)))
+                        candidates))
+              (forward-line 1)))
+          (nreverse candidates))))
+
+    (setq be/helm-c-source-hoogle
+          '((name . "Hoogle")
+            (candidates . be/helm-c-hoogle-set-candidates)
+            (action . (("Add Import"
+                        . (lambda (match)
+                            (be/haskell-add-import
+                             (car match)
+                             (cdr match))))))
+            (filtered-candidate-transformer . (lambda (candidates source)
+                                                candidates))
+            (volatile)
+            (delayed)))
+
+    (defun be/helm-hoogle ()
+      (interactive)
+      (let ((input (or (haskell-ident-at-point)
+                       (and (symbol-at-point)
+                            (symbol-name (symbol-at-point))))))
+        (helm :sources 'be/helm-c-source-hoogle
+              :input input
+              :prompt "Hoogle: "
+              :buffer "*Hoogle search*"))))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   (defun be/haskell-add-type-signature ()
     (interactive)
@@ -212,6 +365,8 @@
               (insert "\n")))
         (error (message "couldn't insert type from ghci")))))
 
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   (defun be/haskell-goto-definition ()
     (interactive)
     (condition-case nil
@@ -219,7 +374,7 @@
       (error
        (let ((cbuff (current-buffer)))
          (be/haskell-switch-to-ghci t)
-         (call-interactively (end-of-buffer))
+         (end-of-buffer)
          (pop-to-buffer cbuff)))))
 
   (defun be/haskell-align-equals ()
@@ -228,12 +383,33 @@
      (region-beginning) (region-end)
      "\\(\\s-*\\) = " 1 0 nil))
 
+  (defun be/haskell-ghci-load-and-test ()
+    (interactive)
+    (let ((command ":main"))
+      (if t
+          (progn
+            (inferior-haskell-reload-file)
+            (inferior-haskell-send-command (inferior-haskell-process) command))
+        (save-window-excursion
+          (inferior-haskell-load-and-run command)))))
+
+
+  (be/util-eval-on-load ("lineker")
+    (make-local-variable 'lineker-column-limit)
+    (setq lineker-column-limit 90))
+
   (setq inferior-haskell-find-project-root nil)
-  (ghc-init)
-  (linum-mode 1)
-  (flymake-mode 1)
-  (haskell-indent-mode)
-  (require 'auto-complete)
+
+  (ignore-errors
+    (require 'ghc)
+    (require 'inf-haskell)
+    (require 'helm)
+    (require 'lineker)
+    (require 'auto-complete)
+    (linum-mode 1)
+    (flymake-mode 1)
+    (lineker-mode 1)
+    (haskell-indent-mode 1))
 
   )
 
