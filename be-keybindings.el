@@ -75,4 +75,8 @@
     (kbd "<f8>-") 'org-clock-goto
     (kbd "<f8>l") 'org-clock-in-last))
 
+(be/util-eval-on-load ("evil" "magit")
+  (evil-define-key 'normal global-map
+    (kbd ",vs") 'magit-status))
+
 (provide 'be-keybindings)
