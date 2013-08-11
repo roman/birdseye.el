@@ -132,6 +132,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(be/util-eval-on-mode "haskell-mode"
+  (turn-on-haskell-indent)
+  (haskell-indent-mode 1))
+
 (be/util-eval-on-load ("haskell-mode")
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -328,15 +332,13 @@
 
     (defun be/haskell-goto-definition ()
       (interactive)
-      k(condition-case nil
+      (condition-case nil
            (inferior-haskell-find-definition (haskell-ident-at-point))
          (error
           (let ((cbuff (current-buffer)))
             (be/haskell-switch-to-ghci t)
             (end-of-buffer)
-            (pop-to-buffer cbuff)))))
-
-)
+            (pop-to-buffer cbuff))))))
 
 
   ;; HELM support for hoogle ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -397,8 +399,6 @@
               :prompt "Hoogle: "
               :buffer "*Hoogle search*"))))
 
-
-
   (be/util-eval-on-load ("lineker")
     (make-local-variable 'lineker-column-limit)
     (setq lineker-column-limit 90))
@@ -408,14 +408,12 @@
   (ignore-errors
     (require 'ghc)
     (require 'inf-haskell)
-    (require 'helm)
-    (require 'lineker)
     (require 'auto-complete)
     (linum-mode 1)
     (flymake-mode 1)
     (lineker-mode 1)
-    (haskell-indent-mode 1))
 
-  )
+    (require 'helm)
+    (require 'lineker)))
 
 (provide 'be-haskell)

@@ -59,12 +59,12 @@
                                            ""))))
         (mode-hook (intern (format "%s-hook" mode-name))))
     `(progn
-       (when (boundp ',mode-hook)
-         (defun ,callback-name ()
+       (defun ,callback-name ()
+           (interactive)
            ,@body)
-         (add-hook ',mode-hook
-                   ',callback-name
-                   t)))))
+       (add-hook ',mode-hook
+                 ',callback-name
+                 t))))
 
 (put 'be/util-eval-on-load 'lisp-indent-function 'defun)
 (put 'be/util-eval-on-mode 'lisp-indent-function 'defun)

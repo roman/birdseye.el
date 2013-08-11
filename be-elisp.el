@@ -11,6 +11,16 @@
       (when symb
         (find-function symb))))
 
-  )
+  (defun be/elisp-delete-elc-file ()
+    "Deletes elc file of current el file"
+    (interactive)
+    (let* ((el-filepath buffer-file-name)
+           (elc-filepath (format "%s.elc"
+                            (file-name-sans-extension el-filepath))))
+      (when (file-exists-p elc-filepath)
+        (delete-file elc-filepath)
+        (byte-compile-file el-filepath))))
+
+  (add-hook 'after-save-hook 'be/elisp-delete-elc-file t))
 
 (provide 'be-elisp)
