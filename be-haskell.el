@@ -132,7 +132,97 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(be/util-eval-on-mode "haskell-mode"
+(be/util-eval-on-load ("haskell-mode")
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (defun be/haskell-add-type-signature ()
+    (interactive)
+    (save-excursion
+      (condition-case nil
+          (progn
+            (beginning-of-line)
+            (let ((type (inferior-haskell-get-result
+                         (concat ":type " (haskell-ident-at-point)))))
+              (insert type)
+              (insert "\n")))
+        (error (message "couldn't insert type from ghci")))))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (defun be/haskell-align-equals ()
+    (interactive)
+    (align-regexp
+     (region-beginning) (region-end)
+     "\\(\\s-*\\) = " 1 0 nil))
+
+  (defun be/haskell-ghci-load-and-test ()
+    (interactive)
+    (let ((command ":main"))
+      (if t
+          (progn
+            (inferior-haskell-reload-file)
+            (inferior-haskell-send-command (inferior-haskell-process) command))
+        (save-window-excursion
+          (inferior-haskell-load-and-run command)))))
+
+
+  ;; Add Lang Pragmas/Options ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (defun be/haskell-add-lang-option (option)
+    (interactive (list
+                  (ido-completing-read
+                   "Which? "
+                   be/haskell-ghc-language-options)))
+    (save-excursion
+      (beginning-of-buffer)
+      (when (not (search-forward option nil t))
+        (insert (format "{-# LANGUAGE %s #-}\n" option)))))
+
+
+  ;; Add Import Statements ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (defun be/haskell-ghc-insert-module ()
+    (interactive)
+    (if (not (executable-find ghc-hoogle-command))
+        (message "\"%s\" not found" ghc-hoogle-command)
+      (let* ((expr0 (ghc-things-at-point))
+             (expr (ghc-read-expression expr0)))
+        (let ((mods (ghc-function-to-modules expr)))
+          (if (null mods)
+              (message "No module guessed")
+            (let* ((first (car mods))
+                   (mod (if (= (length mods) 1)
+                            first
+                          (completing-read "Module name: " mods nil t first))))
+              (be/haskell-add-import mod expr)))))))
+
+  (defun be/haskell-find-module-import (mod)
+    (interactive "sModule: ")
+    (goto-char (point-min))
+    (re-search-forward (format "^import +\\(qualified\\)? +%s +" mod) nil t))
+
+  (defun be/haskell-add-import (mod expr)
+    (interactive)
+    (when (not (and (ignore-errors (inferior-haskell-get-module expr))
+                    (progn
+                      (beginning-of-buffer)
+                      ;;TODO: fix this for multi-line imports
+                      (re-search-forward (format "^import .*%s +*%s" mod expr) nil t))))
+      (let ((existing-import (save-excursion
+                               (be/haskell-find-module-import mod))))
+        (if existing-import
+            (progn
+              (goto-char (match-beginning 0))
+              (end-of-line)
+              (backward-char 1)
+              (up-list)
+              (backward-char 1)
+              (insert ", " expr))
+          (progn
+            (ghc-goto-module-position)
+            (insert (format "import %s (%s)\n" mod expr)))))))
+
   (be/util-eval-on-load "em-glob"
 
     (defun be/haskell-find-cabal-dir ()
@@ -202,96 +292,52 @@
                           (directory-files
                            cabal-dir nil
                            (eshell-glob-regexp "*.cabal")))))
-        (find-file (concat cabal-dir cabal-file)))))
+        (find-file (concat cabal-dir cabal-file))))
 
-  (defun be/haskell-cabal-dev-configure ()
-    (interactive)
-    (let ((cabal-dev-path (be/haskell-find-cabal-dev-dir)))
-      (if (and cabal-dev-path
-               (executable-find "cabal-dev"))
-          (let ((default-directory cabal-dev-path))
-            (call-process-shell-command "cabal-dev configure --enable-tests" nil 0)
-            (message "cabal-dev configure done"))
-        (message "cabal-dev bin or directory wasn't found"))))
-
-  (defun be/haskell-cabal-dev-reload-dependencies ()
-    (interactive)
-    (let ((cabal-dev-path (be/haskell-find-cabal-dev-dir)))
-      (if (and cabal-dev-path
-               (executable-find "cabal-dev"))
-          (let ((default-directory cabal-dev-path))
-            (call-process-shell-command (concat "cabal-dev clean && "
-                                                "cabal-dev configure && "
-                                                "cabal-dev install -fdevelopment")
-                                        nil
-                                        0)
-            (message "cabal-dev dependencies reloaded."))
-        (message "cabal-dev bin or directory wasn't found"))))
-
-  (defun be/haskell-cabal-dev-build ()
-    (interactive)
-    (let* ((cabal-dev-path (be/haskell-find-cabal-dev-dir))
-           (default-directory (or cabal-dev-path default-directory)))
-      (when (and cabal-dev-path
+    (defun be/haskell-cabal-dev-configure ()
+      (interactive)
+      (let ((cabal-dev-path (be/haskell-find-cabal-dev-dir)))
+        (if (and cabal-dev-path
                  (executable-find "cabal-dev"))
-        (compile "cabal-dev build"))))
+            (let ((default-directory cabal-dev-path))
+              (call-process-shell-command "cabal-dev configure --enable-tests" nil 0)
+              (message "cabal-dev configure done"))
+          (message "cabal-dev bin or directory wasn't found"))))
 
+    (defun be/haskell-cabal-dev-reload-dependencies ()
+      (interactive)
+      (let ((cabal-dev-path (be/haskell-find-cabal-dev-dir)))
+        (if (and cabal-dev-path
+                 (executable-find "cabal-dev"))
+            (let ((default-directory cabal-dev-path))
+              (call-process-shell-command (concat "cabal-dev clean && "
+                                                  "cabal-dev configure && "
+                                                  "cabal-dev install -fdevelopment")
+                                          nil
+                                          0)
+              (message "cabal-dev dependencies reloaded."))
+          (message "cabal-dev bin or directory wasn't found"))))
 
-  ;; Add Lang Pragmas/Options ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (defun be/haskell-cabal-dev-build ()
+      (interactive)
+      (let* ((cabal-dev-path (be/haskell-find-cabal-dev-dir))
+             (default-directory (or cabal-dev-path default-directory)))
+        (when (and cabal-dev-path
+                   (executable-find "cabal-dev"))
+          (compile "cabal-dev build"))))
 
-  (defun be/haskell-add-lang-option (option)
-    (interactive (list
-                  (ido-completing-read
-                   "Which? "
-                   be/haskell-ghc-language-options)))
-    (save-excursion
-      (beginning-of-buffer)
-      (when (not (search-forward option nil t))
-        (insert (format "{-# LANGUAGE %s #-}\n" option)))))
+    (defun be/haskell-goto-definition ()
+      (interactive)
+      k(condition-case nil
+           (inferior-haskell-find-definition (haskell-ident-at-point))
+         (error
+          (let ((cbuff (current-buffer)))
+            (be/haskell-switch-to-ghci t)
+            (end-of-buffer)
+            (pop-to-buffer cbuff)))))
 
+)
 
-  ;; Add Import Statements ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  (defun be/haskell-ghc-insert-module ()
-    (interactive)
-    (if (not (executable-find ghc-hoogle-command))
-        (message "\"%s\" not found" ghc-hoogle-command)
-      (let* ((expr0 (ghc-things-at-point))
-             (expr (ghc-read-expression expr0)))
-        (let ((mods (ghc-function-to-modules expr)))
-          (if (null mods)
-              (message "No module guessed")
-            (let* ((first (car mods))
-                   (mod (if (= (length mods) 1)
-                            first
-                          (completing-read "Module name: " mods nil t first))))
-              (be/haskell-add-import mod expr)))))))
-
-  (defun be/haskell-find-module-import (mod)
-    (interactive "sModule: ")
-    (goto-char (point-min))
-    (re-search-forward (format "^import +\\(qualified\\)? +%s +" mod) nil t))
-
-  (defun be/haskell-add-import (mod expr)
-    (interactive)
-    (when (not (and (ignore-errors (inferior-haskell-get-module expr))
-                    (progn
-                      (beginning-of-buffer)
-                      ;;TODO: fix this for multi-line imports
-                      (re-search-forward (format "^import .*%s +*%s" mod expr) nil t))))
-      (let ((existing-import (save-excursion
-                               (be/haskell-find-module-import mod))))
-        (if existing-import
-            (progn
-              (goto-char (match-beginning 0))
-              (end-of-line)
-              (backward-char 1)
-              (up-list)
-              (backward-char 1)
-              (insert ", " expr))
-          (progn
-            (ghc-goto-module-position)
-            (insert (format "import %s (%s)\n" mod expr)))))))
 
   ;; HELM support for hoogle ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -351,47 +397,6 @@
               :prompt "Hoogle: "
               :buffer "*Hoogle search*"))))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  (defun be/haskell-add-type-signature ()
-    (interactive)
-    (save-excursion
-      (condition-case nil
-          (progn
-            (beginning-of-line)
-            (let ((type (inferior-haskell-get-result
-                         (concat ":type " (haskell-ident-at-point)))))
-              (insert type)
-              (insert "\n")))
-        (error (message "couldn't insert type from ghci")))))
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  (defun be/haskell-goto-definition ()
-    (interactive)
-    (condition-case nil
-        (inferior-haskell-find-definition (haskell-ident-at-point))
-      (error
-       (let ((cbuff (current-buffer)))
-         (be/haskell-switch-to-ghci t)
-         (end-of-buffer)
-         (pop-to-buffer cbuff)))))
-
-  (defun be/haskell-align-equals ()
-    (interactive)
-    (align-regexp
-     (region-beginning) (region-end)
-     "\\(\\s-*\\) = " 1 0 nil))
-
-  (defun be/haskell-ghci-load-and-test ()
-    (interactive)
-    (let ((command ":main"))
-      (if t
-          (progn
-            (inferior-haskell-reload-file)
-            (inferior-haskell-send-command (inferior-haskell-process) command))
-        (save-window-excursion
-          (inferior-haskell-load-and-run command)))))
 
 
   (be/util-eval-on-load ("lineker")
