@@ -1,5 +1,7 @@
 (require 'be-utils)
 (require 'be-terminal)
+(require 'be-less)
+(require 'be-scss)
 (require 'be-clojure)
 (require 'be-haskell)
 (require 'be-evil)
