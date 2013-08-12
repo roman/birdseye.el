@@ -13,6 +13,7 @@
 
     (setq evil-default-state 'normal)
     (evil-set-initial-state 'term-mode 'emacs)
+    (evil-set-initial-state 'nrepl-mode 'emacs)
     (evil-set-initial-state 'magit-mode 'motion)
     (evil-set-initial-state 'dvc-status-mode 'motion)
     (evil-set-initial-state 'dvc-diff-mode 'motion)

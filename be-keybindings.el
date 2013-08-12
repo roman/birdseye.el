@@ -82,4 +82,10 @@
   (evil-define-key 'normal global-map
     (kbd ",vs") 'magit-status))
 
+(be/util-eval-on-load ("evil" "be-clojure" "clojure-mode" "nrepl")
+  (evil-define-key 'normal clojure-mode-map
+    (kbd ",gi") 'nrepl-jack-in
+    (kbd ",gq") 'nrepl-quit
+    (kbd ",fl") 'be/clojure-load-current-buffer))
+
 (provide 'be-keybindings)
