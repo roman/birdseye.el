@@ -132,11 +132,22 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(be/util-eval-on-mode "haskell-mode"
-  (turn-on-haskell-indent)
-  (haskell-indent-mode 1))
+
 
 (be/util-eval-on-load ("haskell-mode")
+
+  (defun be/haskell-hspec-set-selector (selector)
+    (interactive (list
+                  (read-string (format "selector (%s): "
+                                       (thing-at-point 'word))
+                               nil 'buster-selector (thing-at-point 'word))))
+    (let ((file  "~/.hspec_selector"))
+      (with-temp-buffer
+        (insert selector)
+        (when (file-writable-p file))
+        (write-region (point-min)
+                      (point-max)
+                      file))))
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -257,10 +268,11 @@
       (interactive)
       (let* ((project-root (be/haskell-find-cabal-dir))
              (cabal-sandbox-dirname
-              (file-name-as-directory (concat project-root ".cabal-sandbox"))))
-        (car (directory-files cabal-sandbox-dirname
+              (file-name-as-directory (concat project-root ".cabal-sandbox")))
+             (package-db (car (directory-files cabal-sandbox-dirname
                               t
                               (eshell-glob-regexp "*-packages.conf.d")))))
+        package-db))
 
     (defun be/haskell-switch-to-ghci (&optional no-reload)
       "Pops the ghci buffer, in case it is already there asks to reload it."
@@ -338,7 +350,16 @@
           (let ((cbuff (current-buffer)))
             (be/haskell-switch-to-ghci t)
             (end-of-buffer)
-            (pop-to-buffer cbuff))))))
+            (pop-to-buffer cbuff)))))
+
+   (be/util-eval-on-load ("flycheck")
+    (let ((current-cmd (get 'haskell-hdevtools :flycheck-command))
+          (package-db  (be/haskell-find-cabal-sandbox-package-db)))
+      (when package-db
+        (put 'haskell-ghc :flycheck-command
+             (append current-cmd (list (format "-package-db=%s" package-db))))
+        (put 'haskell-hdevtools :flycheck-command
+             (append current-cmd (list "-g"  (format "-package-db=%s" package-db))))))))
 
 
   ;; HELM support for hoogle ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -389,7 +410,7 @@
             (volatile)
             (delayed)))
 
-    (defun be/helm-hoogle ()
+    (defun be/haskell-helm-hoogle ()
       (interactive)
       (let ((input (or (haskell-ident-at-point)
                        (and (symbol-at-point)
@@ -403,17 +424,23 @@
     (make-local-variable 'lineker-column-limit)
     (setq lineker-column-limit 90))
 
-  (setq inferior-haskell-find-project-root nil)
 
-  (ignore-errors
+
+  (progn
     (require 'ghc)
+    (require 'lineker)
     (require 'inf-haskell)
     (require 'auto-complete)
-    (linum-mode 1)
-    (flymake-mode 1)
-    (lineker-mode 1)
-
     (require 'helm)
-    (require 'lineker)))
+    (require 'flycheck)))
+
+(be/util-eval-on-mode haskell-mode
+  (setq lineker-column-limit 80)
+  (setq inferior-haskell-find-project-root nil)
+  (linum-mode 1)
+  (flycheck-mode 1)
+  (lineker-mode 1)
+  (turn-on-haskell-indentation))
+
 
 (provide 'be-haskell)

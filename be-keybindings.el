@@ -53,7 +53,7 @@
 
 (be/util-eval-on-load ("evil" "haskell-mode" "be-haskell" "helm")
   (evil-define-key 'normal haskell-mode-map
-    (kbd ",ai") 'be/helm-hoogle))
+    (kbd ",ai") 'be/haskell-helm-hoogle))
 
 (be/util-eval-on-load ("iedit" "be-edit")
   (be/define-key global-map
