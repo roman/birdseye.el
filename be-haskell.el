@@ -427,7 +427,6 @@
     (setq lineker-column-limit 90))
 
   (progn
-    (require 'ghc)
     (require 'lineker)
     (require 'inf-haskell)
     (require 'auto-complete)
