@@ -353,13 +353,15 @@
             (pop-to-buffer cbuff)))))
 
    (be/util-eval-on-load ("flycheck")
-    (let ((current-cmd (get 'haskell-hdevtools :flycheck-command))
-          (package-db  (be/haskell-find-cabal-sandbox-package-db)))
+    (let ((package-db  (be/haskell-find-cabal-sandbox-package-db)))
       (when package-db
         (put 'haskell-ghc :flycheck-command
-             (append current-cmd (list (format "-package-db=%s" package-db))))
-        (put 'haskell-hdevtools :flycheck-command
-             (append current-cmd (list "-g"  (format "-package-db=%s" package-db))))))))
+             (list "ghc" "-Wall" "-fno-code"
+                   "-fhelpful-errors" "-isrc" (format "-package-db=%s" package-db)
+                   'source-inplace))
+        (let ((current-cmd (get 'haskell-hdevtools :flycheck-command)))
+          (put 'haskell-hdevtools :flycheck-command
+               (append current-cmd (list "-g" "-isrc" "-g" (format "-package-db=%s" package-db)))))))))
 
 
   ;; HELM support for hoogle ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -423,8 +425,6 @@
   (be/util-eval-on-load ("lineker")
     (make-local-variable 'lineker-column-limit)
     (setq lineker-column-limit 90))
-
-
 
   (progn
     (require 'ghc)
