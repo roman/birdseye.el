@@ -8,9 +8,16 @@
 (require 'be-elisp)
 (require 'be-keybindings)
 (require 'be-projectile)
+(require 'be-evil-ace-jump)
 
 (require 'iedit)
 (require 'auto-complete)
 (require 'navorski)
+
+(ignore-errors
+  (require 'anzu)
+  (require 'ace-jump-mode)
+  (global-anzu-mode))
+
 
 (provide 'birdseye)

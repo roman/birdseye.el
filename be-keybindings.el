@@ -50,6 +50,13 @@
     (kbd ",it") 'inferior-haskell-type
     (kbd "<f4>j") 'be/haskell-jump-to-cabal-file))
 
+(be/util-eval-on-load ("evil" "flycheck")
+  (evil-define-key 'normal global-map
+    (kbd ",cn") 'flycheck-next-error
+    (kbd ",cf") 'flycheck-first-error
+    (kbd ",cc") 'flycheck-compile
+    (kbd ",cl") 'flycheck-list-errors))
+
 (be/util-eval-on-load ("evil" "projectile")
   (evil-define-key 'normal global-map
     (kbd ",pf") 'projectile-find-file
@@ -57,7 +64,16 @@
     (kbd ",pd") 'projectile-find-dir
     (kbd ",pr") 'projectile-replace
     (kbd ",po") 'projectile-multi-occur
-    (kbd ",pk") 'projectile-kill-buffers))
+    (kbd ",pk") 'projectile-kill-buffers
+    (kbd ",pb") 'projectile-switch-to-buffer
+    (kbd ",pv") 'projectile-recentf
+    (kbd ",ps") 'projectile-switch-project))
+
+(be/util-eval-on-load ("evil" "ace-jump-mode")
+  (evil-define-key 'normal global-map
+    (kbd ",m") 'ace-jump-line-mode
+    (kbd ",z") 'ace-jump-word-mode
+    (kbd ",,") 'ace-jump-char-mode))
 
 (be/util-eval-on-load ("evil" "haskell-mode" "be-haskell" "helm")
   (evil-define-key 'normal haskell-mode-map
@@ -73,6 +89,9 @@
     (kbd ",ma") 'be/iedit-toggle))
 
 (be/util-eval-on-load ("evil")
+  (evil-define-key 'normal global-map
+    (kbd ",vs") 'magit-status)
+
   (be/define-key global-map
     (kbd "<f7>e") 'be/evil-emacs-state
     (kbd "<f7>n") 'be/evil-normal-state
@@ -85,10 +104,6 @@
   (be/define-key global-map
     (kbd "<f8>-") 'org-clock-goto
     (kbd "<f8>l") 'org-clock-in-last))
-
-(be/util-eval-on-load ("evil" "magit")
-  (evil-define-key 'normal global-map
-    (kbd ",vs") 'magit-status))
 
 (be/util-eval-on-load ("evil" "be-clojure" "clojure-mode" "nrepl")
   (evil-define-key 'normal clojure-mode-map
