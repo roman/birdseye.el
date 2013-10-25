@@ -90,7 +90,8 @@
                                         (eshell-glob-regexp glob))))
       (cond
        (file-found (concat dir (car file-found)))
-       ((not (string= dir "/"))
+       ((not (or (string= dir "/")
+                 (string= dir "~/")))
         (be/util-locate-dominating-file glob
                                         (be/util-parent-dir dir)))
        (t nil)))))
