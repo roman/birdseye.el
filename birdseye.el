@@ -7,6 +7,7 @@
 (require 'be-evil)
 (require 'be-elisp)
 (require 'be-keybindings)
+(require 'be-projectile)
 
 (require 'iedit)
 (require 'auto-complete)

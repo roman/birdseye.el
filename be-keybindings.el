@@ -50,6 +50,15 @@
     (kbd ",it") 'inferior-haskell-type
     (kbd "<f4>j") 'be/haskell-jump-to-cabal-file))
 
+(be/util-eval-on-load ("evil" "projectile")
+  (evil-define-key 'normal global-map
+    (kbd ",pf") 'projectile-find-file
+    (kbd ",pg") 'projectile-grep
+    (kbd ",pd") 'projectile-find-dir
+    (kbd ",pr") 'projectile-replace
+    (kbd ",po") 'projectile-multi-occur
+    (kbd ",pk") 'projectile-kill-buffers))
+
 (be/util-eval-on-load ("evil" "haskell-mode" "be-haskell" "helm")
   (evil-define-key 'normal haskell-mode-map
     (kbd ",ai") 'be/haskell-helm-hoogle))
