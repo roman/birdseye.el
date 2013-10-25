@@ -40,7 +40,6 @@
  (evil-define-key 'normal haskell-mode-map
     (kbd "M-.")  'be/haskell-goto-definition
     (kbd ",gi") 'be/haskell-switch-to-ghci
-    (kbd ",rc") 'be/haskell-cabal-dev-configure
     (kbd ",at") 'be/haskell-add-type-signature
     (kbd ",ap") 'be/haskell-add-lang-option
     (kbd ",fl") 'inferior-haskell-load-file
