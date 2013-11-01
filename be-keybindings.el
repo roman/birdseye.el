@@ -71,9 +71,9 @@
 
 (be/util-eval-on-load ("evil" "ace-jump-mode")
   (evil-define-key 'normal global-map
-    (kbd ",m") 'ace-jump-line-mode
-    (kbd ",z") 'ace-jump-word-mode
-    (kbd ",,") 'ace-jump-char-mode))
+    (kbd "SPC") 'ace-jump-char-mode
+    (kbd "C-SPC") 'ace-jump-line-mode
+    (kbd ",z") 'ace-jump-word-mode))
 
 (be/util-eval-on-load ("evil" "haskell-mode" "be-haskell" "helm")
   (evil-define-key 'normal haskell-mode-map

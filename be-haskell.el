@@ -434,7 +434,7 @@
     (require 'flycheck)))
 
 (be/util-eval-on-mode haskell-mode
-  (setq lineker-column-limit 80)
+  (setq lineker-column-limit 90)
   (setq inferior-haskell-find-project-root nil)
   (linum-mode 1)
   (flycheck-mode 1)
