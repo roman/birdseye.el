@@ -86,7 +86,7 @@
 
 (be/util-eval-on-load ("evil" "iedit" "be-edit")
   (evil-define-key 'normal global-map
-    (kbd ",ma") 'be/iedit-toggle))
+    (kbd ",,") 'be/iedit-toggle))
 
 (be/util-eval-on-load ("evil")
   (evil-define-key 'normal global-map

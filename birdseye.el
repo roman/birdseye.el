@@ -4,6 +4,7 @@
 (require 'be-scss)
 (require 'be-clojure)
 (require 'be-haskell)
+(require 'be-edit)
 (require 'be-evil)
 (require 'be-elisp)
 (require 'be-keybindings)
