@@ -268,10 +268,13 @@
       (interactive)
       (let* ((project-root (be/haskell-find-cabal-dir))
              (cabal-sandbox-dirname
-              (file-name-as-directory (concat project-root ".cabal-sandbox")))
-             (package-db (car (directory-files cabal-sandbox-dirname
-                              t
-                              (eshell-glob-regexp "*-packages.conf.d")))))
+              (and project-root
+                   (file-name-as-directory
+                    (concat project-root ".cabal-sandbox"))))
+             (package-db (and cabal-sandbox-dirname
+                              (car
+                               (directory-files
+                                cabal-sandbox-dirname t (eshell-glob-regexp "*-packages.conf.d"))))))
         package-db))
 
     (defun be/haskell-switch-to-ghci (&optional no-reload)
