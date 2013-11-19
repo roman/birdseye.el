@@ -1,4 +1,5 @@
 (add-to-list 'auto-mode-alist '("[.]cljs$" . clojure-mode))
+(require 'be-utils)
 
 (be/util-eval-on-mode "clojure-mode"
   (setq lineker-column-limit 90)
