@@ -297,7 +297,7 @@
                                     cabal-dev-dir
                                     default-directory))
              (haskell-program-name (or (and cabal-sandbox-dir
-                                            (format "ghci \"-package-db\" \"%s\" \"-isrc\""
+                                            (format "ghci \"-package-db\" \"%s\" \"-isrc\" \"-itests\""
                                                     (be/haskell-find-cabal-sandbox-package-db)))
                                        (and cabal-dev-dir
                                             "cabal-dev \"ghci\"")
