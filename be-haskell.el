@@ -266,11 +266,7 @@
 
     (defun be/haskell-find-cabal-sandbox-package-db ()
       (interactive)
-      (let* ((project-root (be/haskell-find-cabal-dir))
-             (cabal-sandbox-dirname
-              (and project-root
-                   (file-name-as-directory
-                    (concat project-root ".cabal-sandbox"))))
+      (let* ((cabal-sandbox-dirname (be/haskell-find-cabal-sandbox-dir))
              (package-db (and cabal-sandbox-dirname
                               (car
                                (directory-files
@@ -297,7 +293,7 @@
                                     cabal-dev-dir
                                     default-directory))
              (haskell-program-name (or (and cabal-sandbox-dir
-                                            (format "ghci \"-package-db\" \"%s\" \"-isrc\""
+                                            (format "ghci \"-package-db\" \"%s\" \"-i.\" \"-isrc\" \"-itest\" \"-itests\""
                                                     (be/haskell-find-cabal-sandbox-package-db)))
                                        (and cabal-dev-dir
                                             "cabal-dev \"ghci\"")
