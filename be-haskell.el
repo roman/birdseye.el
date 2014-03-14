@@ -348,23 +348,23 @@
     (defun be/haskell-goto-definition ()
       (interactive)
       (condition-case nil
-           (inferior-haskell-find-definition (haskell-ident-at-point))
-         (error
-          (let ((cbuff (current-buffer)))
-            (be/haskell-switch-to-ghci t)
-            (end-of-buffer)
-            (pop-to-buffer cbuff)))))
+          (inferior-haskell-find-definition (haskell-ident-at-point))
+        (error
+         (let ((cbuff (current-buffer)))
+           (be/haskell-switch-to-ghci t)
+           (end-of-buffer)
+           (pop-to-buffer cbuff)))))
 
-   (be/util-eval-on-load ("flycheck")
-    (let ((package-db  (be/haskell-find-cabal-sandbox-package-db)))
-      (when package-db
-        (put 'haskell-ghc :flycheck-command
-             (list "ghc" "-Wall" "-fno-code"
-                   "-fhelpful-errors" "-isrc" (format "-package-db=%s" package-db)
-                   'source-inplace))
-        (let ((current-cmd (get 'haskell-hdevtools :flycheck-command)))
-          (put 'haskell-hdevtools :flycheck-command
-               (append current-cmd (list "-g" "-isrc" "-g" (format "-package-db=%s" package-db)))))))))
+    (be/util-eval-on-load ("flycheck")
+      (let ((package-db  (be/haskell-find-cabal-sandbox-package-db)))
+        (when package-db
+          (put 'haskell-ghc :flycheck-command
+               (list "ghc" "-Wall" "-fno-code"
+                     "-fhelpful-errors" "-isrc" (format "-package-db=%s" package-db)
+                     'source-inplace))
+          (let ((current-cmd (get 'haskell-hdevtools :flycheck-command)))
+            (put 'haskell-hdevtools :flycheck-command
+                 (append current-cmd (list "-g" "-isrc" "-g" (format "-package-db=%s" package-db)))))))))
 
 
   ;; HELM support for hoogle ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
