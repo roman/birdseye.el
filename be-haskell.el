@@ -293,7 +293,7 @@
                                     cabal-dev-dir
                                     default-directory))
              (haskell-program-name (or (and cabal-sandbox-dir
-                                            (format "ghci \"-package-db\" \"%s\" \"-i.\" \"-isrc\" \"-itest\" \"-itests\""
+                                            (format "ghci \"-package-db\" \"%s\""
                                                     (be/haskell-find-cabal-sandbox-package-db)))
                                        (and cabal-dev-dir
                                             "cabal-dev \"ghci\"")
@@ -429,12 +429,14 @@
     (require 'lineker)
     (require 'inf-haskell)
     (require 'auto-complete)
+    (require 'ghc)
     (require 'helm)
     (require 'flycheck)))
 
 (be/util-eval-on-mode haskell-mode
   (setq lineker-column-limit 90)
   (setq inferior-haskell-find-project-root nil)
+  (setq haskell-stylish-on-save t)
   (linum-mode 1)
   (flycheck-mode 1)
   (lineker-mode 1)
