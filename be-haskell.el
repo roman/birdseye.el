@@ -246,13 +246,7 @@
 
     (defun be/haskell-find-cabal-sandbox-dir ()
       "Returns the directory path where the .cabal-sandbox folder is."
-      (let ((cabal-dir (be/haskell-find-cabal-dir))
-            (cabal-sandbox-dir (be/util-locate-dominating-file ".cabal-sandbox")))
-        (while (and cabal-dir cabal-sandbox-dir
-                    (or (not (string-equal cabal-dir cabal-sandbox-dir))
-                        (not cabal-sandbox-dir)))
-          (setq cabal-sandbox-dir (be/util-parent-dir cabal-sandbox-dir)))
-        cabal-sandbox-dir))
+      (be/util-locate-dominating-file ".cabal-sandbox"))
 
     (defun be/haskell-find-cabal-dev-dir ()
       "Returns the directory path where the cabal-dev folder is."
