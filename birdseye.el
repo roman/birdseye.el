@@ -9,6 +9,7 @@
 (require 'be-keybindings)
 (require 'be-projectile)
 (require 'be-evil-ace-jump)
+(require 'be-scala)
 (require 'be-clojure)
 
 (provide 'birdseye)

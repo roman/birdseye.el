@@ -111,11 +111,12 @@
     (kbd ",gq") 'nrepl-quit
     (kbd ",fl") 'be/clojure-load-current-buffer))
 
-(be/util-eval-on-load ("evil" "be-scala" "scala-mode")
+(be/util-eval-on-load ("evil" "be-scala" "scala-mode2")
   (evil-define-key 'normal scala-mode-map
     (kbd ",gi") 'be/sbt-init-scala-repl
-    (kbd ",fl") 'be/sbt-load-file
-    (kbd ",fr") 'be/sbt-load-file
+    (kbd ",qi") 'be/sbt-stop-scala-repl
+    (kbd ",fl") 'be/scala-repl-load-file
+    (kbd ",fr") 'be/scala-repl-load-file
     (kbd "M-.") 'sbt-find-definitions))
 
 (be/util-eval-on-load ("evil" "be-scala" "sbt-mode")

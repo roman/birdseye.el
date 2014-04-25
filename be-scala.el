@@ -1,6 +1,6 @@
 (require 'be-utils)
 
-(be/util-eval-on-load ("sbt-mode")
+(be/util-eval-on-load ("scala-mode2")
   ;; compilation-skip-threshold tells the compilation minor-mode
   ;; which type of compiler output can be skipped. 1 = skip info
   ;; 2 = skip info and warnings.
@@ -29,12 +29,19 @@
     (interactive)
     (be/sbt-command "test:compile"))
 
+  (defun be/sbt-init
+    (interactive)
+    (be/sbt-start))
+
   (defun be/sbt-init-scala-repl ()
     (interactive)
-    (be/sbt-start)
     (be/sbt-command "console"))
 
-  (defun be/sbt-load-file ()
+  (defun be/sbt-stop-scala-repl ()
+    (interactive)
+    (be/sbt-command ":q"))
+
+  (defun be/scala-repl-load-file ()
     (interactive)
     (let ((file-name (buffer-file-name)))
       (be/sbt-command (concat ":load " file-name)))))
