@@ -113,8 +113,9 @@
 
 (be/util-eval-on-load ("evil" "be-scala" "scala-mode2")
   (evil-define-key 'normal scala-mode-map
-    (kbd ",gi") 'be/sbt-init-scala-repl
-    (kbd ",qi") 'be/sbt-stop-scala-repl
+    (kbd ",gi") 'be/init-scala-repl
+    (kbd ",rr") 'be/init-sbt-runner
+    (kbd ",rt") 'be/init-sbt-tester
     (kbd ",fl") 'be/scala-repl-load-file
     (kbd ",fr") 'be/scala-repl-load-file
     (kbd "M-.") 'sbt-find-definitions))

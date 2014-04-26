@@ -6,10 +6,21 @@
   ;; 2 = skip info and warnings.
   (setq compilation-skip-threshold 1)
 
-  (defun be/sbt-start ()
-    (interactive)
-    (sbt:run-sbt t nil)
-    (pop-to-buffer (sbt:buffer-name)))
+  (defun be/sbt-root-directory (path)
+    (be/util-parent-dir
+       (be/util-locate-dominating-file "*.sbt" path)))
+
+  (nav/defterminal scala-sbt-runner
+    :buffer-name "sbt-runner"
+    :program-path "/usr/local/bin/sbt"
+    :program-args "~ run"
+    :modify-default-directory be/sbt-root-directory)
+
+  (nav/defterminal scala-sbt-tester
+    :buffer-name "sbt-tester"
+    :program-path "/usr/local/bin/sbt"
+    :program-args "~ test"
+    :modify-default-directory be/sbt-root-directory)
 
   (defun be/sbt-command (command)
     (unless command (error "Please specify a command"))
@@ -25,25 +36,25 @@
       (comint-send-string (current-buffer) (concat command "\n"))
       (setq sbt:previous-command command)))
 
-  (defun be/sbt-run-tests ()
-    (interactive)
-    (be/sbt-command "test:compile"))
-
-  (defun be/sbt-init
-    (interactive)
-    (be/sbt-start))
-
-  (defun be/sbt-init-scala-repl ()
+  (defun be/init-scala-repl ()
     (interactive)
     (be/sbt-command "console"))
 
-  (defun be/sbt-stop-scala-repl ()
+  (defun be/init-sbt-runner ()
     (interactive)
-    (be/sbt-command ":q"))
+    (nav/scala-sbt-runner-pop-to-buffer))
+
+  (defun be/init-sbt-tester ()
+    (interactive)
+    (nav/scala-sbt-tester-pop-to-buffer))
 
   (defun be/scala-repl-load-file ()
     (interactive)
-    (let ((file-name (buffer-file-name)))
-      (be/sbt-command (concat ":load " file-name)))))
+    (let ((file-contents
+           (s-join "\n"
+                   (--filter (not (s-matches? "^package" it))
+                             (s-lines (buffer-string))))))
+      (be/sbt-command
+       (concat ":paste\n" file-contents "\n" (kbd "C-D"))))))
 
 (provide 'be-scala)
