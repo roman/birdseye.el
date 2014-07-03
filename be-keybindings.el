@@ -89,8 +89,11 @@
     (kbd ",,") 'be/iedit-toggle))
 
 (be/util-eval-on-load ("evil")
+  (evil-define-key 'visual global-map
+    (kbd ",n") 'narrow-to-region)
   (evil-define-key 'normal global-map
-    (kbd ",vs") 'magit-status)
+    (kbd ",vs") 'magit-status
+    (kbd ",w")  'widen)
 
   (be/define-key global-map
     (kbd "<f7>e") 'be/evil-emacs-state
@@ -124,5 +127,10 @@
   (evil-define-key 'emacs sbt-mode-map
     (kbd "C-a") 'comint-bol
     (kbd "M-RET") 'comint-accumulate))
+
+(be/util-eval-on-load ("cider")
+  (evil-define-key 'normal clojure-mode-map
+    (kbd ",gi") 'cider-jack-in
+    (kbd "M-.") 'cider-jump))
 
 (provide 'be-keybindings)

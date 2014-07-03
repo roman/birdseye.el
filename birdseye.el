@@ -1,8 +1,8 @@
 (require 'be-utils)
+(require 'be-basics)
 (require 'be-terminal)
 (require 'be-less)
 (require 'be-scss)
-(require 'be-haskell)
 (require 'be-edit)
 (require 'be-evil)
 (require 'be-elisp)
@@ -11,5 +11,7 @@
 (require 'be-evil-ace-jump)
 (require 'be-scala)
 (require 'be-clojure)
+(require 'be-haskell)
+
 
 (provide 'birdseye)

@@ -42,11 +42,11 @@
 
   (defun be/init-sbt-runner ()
     (interactive)
-    (nav/scala-sbt-runner-pop-to-buffer))
+    (nav/pop-to-buffer scala-sbt-runner))
 
   (defun be/init-sbt-tester ()
     (interactive)
-    (nav/scala-sbt-tester-pop-to-buffer))
+    (nav/pop-to-buffer scala-sbt-tester))
 
   (defun be/scala-repl-load-file ()
     (interactive)
