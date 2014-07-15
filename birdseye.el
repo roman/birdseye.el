@@ -11,6 +11,7 @@
 (require 'be-evil-ace-jump)
 (require 'be-scala)
 (require 'be-clojure)
+(require 'be-ruby)
 (require 'be-haskell)
 
 
