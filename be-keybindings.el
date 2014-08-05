@@ -108,6 +108,11 @@
     (kbd "<f8>-") 'org-clock-goto
     (kbd "<f8>l") 'org-clock-in-last))
 
+(be/util-eval-on-load ("evil" "org")
+  (evil-define-key 'normal org-mode-map
+    (kbd "M-k") 'org-move-subtree-up
+    (kbd "M-j") 'org-move-subtree-down))
+
 (be/util-eval-on-load ("evil" "be-clojure" "clojure-mode" "nrepl")
   (evil-define-key 'normal clojure-mode-map
     (kbd ",gi") 'nrepl-jack-in
