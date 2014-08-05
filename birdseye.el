@@ -13,6 +13,7 @@
 (require 'be-clojure)
 (require 'be-ruby)
 (require 'be-haskell)
+(require 'be-pbcopy)
 
 
 (provide 'birdseye)
