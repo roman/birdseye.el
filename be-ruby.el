@@ -5,9 +5,11 @@
     (rvm-activate-corresponding-ruby)))
 
 (be/util-eval-on-mode "ruby-mode"
+  (setq ruby-insert-encoding-magic-comment nil)
   (linum-mode 1))
 
 (be/util-eval-on-mode "enh-ruby-mode"
+  (setq ruby-insert-encoding-magic-comment nil)
   (linum-mode 1))
 
 (be/util-eval-on-load "ruby-mode" "robe"

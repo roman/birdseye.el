@@ -128,6 +128,14 @@
     (kbd ",fr") 'be/scala-repl-load-file
     (kbd "M-.") 'sbt-find-definitions))
 
+(be/util-eval-on-load ("evil" "enh-ruby-mode")
+  (evil-define-key 'normal enh-ruby-mode-map
+    (kbd ",en") 'enh-ruby-find-error))
+
+(be/util-eval-on-load ("evil" "enh-ruby-mode" "robe")
+  (evil-define-key 'normal enh-ruby-mode-map
+    (kbd "M-.") 'robe-jump))
+
 (be/util-eval-on-load ("evil" "be-scala" "sbt-mode")
   (evil-define-key 'emacs sbt-mode-map
     (kbd "C-a") 'comint-bol
