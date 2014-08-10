@@ -2,9 +2,10 @@
 
 (be/define-key global-map
   (kbd "<f5>") 'undo
-  (kbd "<f4>m") 'mark-sexp
-  (kbd "<f4>e") 'iedit-mode
-  (kbd "<f4>d") 'eval-defun)
+  ;; (kbd "<f4>m") 'mark-sexp
+  ;; (kbd "<f4>e") 'iedit-mode
+  ;; (kbd "<f4>d") 'eval-defun
+  )
 
 (be/util-eval-on-load "be-elisp"
   (be/define-key emacs-lisp-mode-map
@@ -48,7 +49,8 @@
     (kbd ",.")  'inferior-haskell-find-definition
     (kbd ",ii") 'inferior-haskell-info
     (kbd ",it") 'inferior-haskell-type
-    (kbd "<f4>j") 'be/haskell-jump-to-cabal-file))
+    ;; (kbd "<f4>j") 'be/haskell-jump-to-cabal-file
+    ))
 
 (be/util-eval-on-load ("evil" "flycheck")
   (evil-define-key 'normal global-map
@@ -79,10 +81,10 @@
   (evil-define-key 'normal haskell-mode-map
     (kbd ",ai") 'be/haskell-helm-hoogle))
 
-(be/util-eval-on-load ("iedit" "be-edit")
-  (be/define-key global-map
-    (kbd "<f4>o") 'be/occur-at-point
-    (kbd "<f4>e") 'be/iedit-toggle))
+;; (be/util-eval-on-load ("iedit" "be-edit")
+;;   (be/define-key global-map
+;;     (kbd "<f4>o") 'be/occur-at-point
+;;     (kbd "<f4>e") 'be/iedit-toggle))
 
 (be/util-eval-on-load ("evil" "iedit" "be-edit")
   (evil-define-key 'normal global-map
