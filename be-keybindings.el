@@ -105,6 +105,16 @@
     (kbd "<f7>r") 'be/evil-normal-state
     (kbd "<f7>t") 'be/evil-emacs-state))
 
+(be/util-eval-on-load ("evil" "magit")
+  (evil-define-key 'motion git-rebase-mode-map
+    (kbd "M-k") 'git-rebase-move-line-up
+    (kbd "M-j") 'git-rebase-move-line-down
+    (kbd "f")   'git-rebase-fixup
+    (kbd "r")   'git-rebase-reword
+    (kbd "s")   'git-rebase-squash
+    (kbd "u")   'git-rebase-undo
+    (kbd "d")   'git-rebase-kill-line))
+
 (be/util-eval-on-load ("org")
   (be/define-key global-map
     (kbd "<f8>-") 'org-clock-goto

@@ -16,6 +16,7 @@
     (evil-set-initial-state 'sbt-mode 'emacs)
     (evil-set-initial-state 'nrepl-mode 'emacs)
     (evil-set-initial-state 'magit-mode 'motion)
+    (evil-set-initial-state 'git-rebase-mode 'motion)
     (evil-set-initial-state 'dvc-status-mode 'motion)
     (evil-set-initial-state 'dvc-diff-mode 'motion)
     (evil-set-initial-state 'diff-mode 'motion)
