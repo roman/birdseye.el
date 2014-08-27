@@ -9,7 +9,7 @@
   (linum-mode 1)
   (be/util-eval-on-load ("robe")
     (robe-mode 1))
-  (be/util-eval-on-load ("hideshow-org)
+  (be/util-eval-on-load ("hideshow-org")
     (hs-org/minor-mode 1)))
 
 (be/util-eval-on-mode enh-ruby-mode
