@@ -1,6 +1,7 @@
 (require 'be-utils)
 (require 'be-basics)
 (require 'be-terminal)
+(require 'be-folding)
 (require 'be-less)
 (require 'be-scss)
 (require 'be-edit)
