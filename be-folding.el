@@ -18,7 +18,4 @@
                  enh-ruby-forward-sexp nil)))
 
 
-(add-hook 'enh-ruby-mode '(lambda () (hs-minor-mode 1)))
-
-
 (provide 'zoo-folding)
