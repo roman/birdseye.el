@@ -18,4 +18,4 @@
                  enh-ruby-forward-sexp nil)))
 
 
-(provide 'zoo-folding)
+(provide 'be-folding)
