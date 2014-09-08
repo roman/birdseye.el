@@ -15,6 +15,6 @@
 (require 'be-ruby)
 (require 'be-haskell)
 (require 'be-pbcopy)
-
+(require 'be-org)
 
 (provide 'birdseye)
