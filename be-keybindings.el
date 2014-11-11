@@ -37,6 +37,12 @@
     (kbd "C-c =") 'be/haskell-align-equals
     (kbd "M-=") 'haskell-indent-align-guards-and-rhs))
 
+(be/util-eval-on-load ("purescript-mode" "be-purescript")
+  (evil-define-key 'normal purescript-mode-map
+    (kbd ",gi") 'be/purescript-start
+    (kbd ",fl") 'be/purescript-load
+    (kbd ",fr") 'be/purescript-reload))
+
 (be/util-eval-on-load ("evil" "haskell-mode" "be-haskell" "em-glob")
  (evil-define-key 'normal haskell-mode-map
     (kbd "M-.")  'be/haskell-goto-definition

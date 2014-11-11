@@ -14,6 +14,7 @@
 (require 'be-clojure)
 (require 'be-ruby)
 (require 'be-haskell)
+(require 'be-purescript)
 (require 'be-pbcopy)
 (require 'be-org)
 
