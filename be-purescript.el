@@ -1,4 +1,4 @@
-(require 'be-util)
+(require 'be-utils)
 
 (be/util-eval-on-mode purescript-mode
   (turn-on-purescript-indentation))
