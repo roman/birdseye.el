@@ -6,6 +6,7 @@
 (require 'be-scss)
 (require 'be-edit)
 (require 'be-evil)
+(require 'be-sql)
 (require 'be-elisp)
 (require 'be-keybindings)
 (require 'be-projectile)
